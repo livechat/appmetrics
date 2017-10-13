@@ -14,8 +14,12 @@
  * limitations under the License.
  *******************************************************************************/
 'use strict';
-// Default behaviour for npm test - app will be closed with endRun() so timeout not needed
-var appmetrics = require('../');
+
+// Used for running globally with node-hc - testing agent runs and doesn't crash process
+// In case it doesn't, set a timeout
+
+var appmetrics;
+
 // Write a string to memory on timer
 var ih = setInterval(function() {
   var dummy = new Buffer(1024 * 1024);
@@ -23,7 +27,11 @@ var ih = setInterval(function() {
   dummy.toString()[0];
 }, 100);
 
-module.exports.appmetrics = appmetrics;
+// run long enough to ensure the agent has loaded and process doesn't crash
+var duration_secs = process.argv[2] || 10; // Default 10 seconds for global tests
+setTimeout(function() {
+  clearInterval(ih);
+}, duration_secs * 1000);
 
 module.exports.start = function start() {
   return appmetrics.start();
