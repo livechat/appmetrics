@@ -19,8 +19,10 @@ var http = require('http');
 
 module.exports.server = http.createServer((req, res) => {
   // Send "Hello World" to every request
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Hello World');
+  setTimeout(function(){
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end('Hello World');
+  }, 10);
 });
 
 this.server.listen(0);

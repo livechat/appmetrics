@@ -68,6 +68,17 @@ HttpOutboundProbe.prototype.attach = function(name, target) {
       // Before 'http.request' function
       function(obj, methodName, methodArgs, probeData) {
         // Start metrics
+
+        // add fake callback - this is required for measuring duration with around fn
+        if (aspect.findCallbackArg(methodArgs) === undefined) {
+          if (methodArgs.length > 0 && methodArgs[methodArgs.length-1] == null) {
+            methodArgs[methodArgs.length-1] = new Function
+          }else{
+            methodArgs[methodArgs.length] = new Function();
+            ++methodArgs.length;
+          }
+        }
+
         that.metricsProbeStart(probeData);
         that.requestProbeStart(probeData);
         // End metrics
