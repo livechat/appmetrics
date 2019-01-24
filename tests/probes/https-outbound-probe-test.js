@@ -40,7 +40,7 @@ monitor.on('https-outbound', function(data) {
 
 function checkHttpOutboundData(data, t) {
   t.ok(isInteger(data.time), 'Timestamp is an integer');
-  t.ok(data.duration >= 10, 'Request duration is properly measured.')
+  t.ok(data.duration >= 10, 'Request duration is properly measured.');
   t.equals(data.method, 'GET', 'Should report GET as HTTP request method');
   t.equals(data.url, `https://localhost:${server.address().port}/`,
     `Should report https://localhost:${server.address().port}/ as URL`);

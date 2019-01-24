@@ -70,15 +70,15 @@ HttpsOutboundProbe.prototype.attach = function(name, target) {
       // Before 'https.request' function
       function(obj, methodName, methodArgs, probeData) {
 
-          // add fake callback - this is required for measuring duration with around fn
-          if (aspect.findCallbackArg(methodArgs) === undefined) {
-            if (methodArgs.length > 0 && methodArgs[methodArgs.length-1] == null) {
-              methodArgs[methodArgs.length-1] = new Function
-            }else{
-              methodArgs[methodArgs.length] = new Function();
-              ++methodArgs.length;
-            }
+        // add fake callback - this is required for measuring duration with around fn
+        if (aspect.findCallbackArg(methodArgs) === undefined) {
+          if (methodArgs.length > 0 && methodArgs[methodArgs.length - 1] == null) {
+            methodArgs[methodArgs.length - 1] = function(){};
+          } else {
+            methodArgs[methodArgs.length] = function(){};
+            ++methodArgs.length;
           }
+        }
 
         // Start metrics
         that.metricsProbeStart(probeData);

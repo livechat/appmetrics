@@ -22,32 +22,17 @@ var http = require('http');
 
 var tap = require('tap');
 
-tap.plan(4);
+tap.plan(2);
 
 tap.tearDown(function() {
   server.close();
 });
 
-var completedTests = 0;
-
 monitor.on('http', function(data) {
-  if (completedTests < 2) {
-    tap.test('HTTP Event', function(t) {
-      checkHttpData(data, t);
-      t.end();
-      completedTests++;
-    });
-  }
-});
-
-monitor.on('request', function(data) {
-  if (completedTests < 4) {
-    tap.test('HTTP Request Event', function(t) {
-      checkHttpRequestData(data.request.context, t);
-      t.end();
-      completedTests++;
-    });
-  }
+  tap.test('HTTP Event', function(t) {
+    checkHttpData(data, t);
+    t.end();
+  });
 });
 
 function checkHttpData(data, t) {
@@ -63,16 +48,6 @@ function checkHttpData(data, t) {
   t.equals(data.hasOwnProperty('requestHeader'), true, 'Should have HTTP property requestHeader;');
 }
 
-function checkHttpRequestData(data, t) {
-  t.equals(data.method, 'GET', 'Should report GET as HTTP request method');
-  t.equals(data.url, '/', 'Should report / as URL');
-  t.equals(data.hasOwnProperty('statusCode'), true, 'Should have HTTP property statusCode;');
-  t.ok(isInteger(data.statusCode), 'statusCode is an integer');
-  t.equals(data.hasOwnProperty('requestHeader'), true, 'Should have HTTP property requestHeader;');
-  t.equals(data.hasOwnProperty('header'), true, 'Should have HTTP property header;');
-  t.equals(data.hasOwnProperty('contentType'), true, 'Should have HTTP property contentType;');
-}
-
 function isInteger(n) {
   return isNumeric(n) && n % 1 == 0;
 }
@@ -80,16 +55,6 @@ function isInteger(n) {
 function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
-
-// Request with a callback
-http.get(`http://localhost:${server.address().port}/`, function(res) {});
-
-// Request without a callback
-http.get(`http://localhost:${server.address().port}/`);
-
-// Enable requests
-monitor.enable('requests');
-monitor.disable('http');
 
 // Request with a callback
 http.get(`http://localhost:${server.address().port}/`, function(res) {});
