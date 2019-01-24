@@ -71,10 +71,10 @@ HttpOutboundProbe.prototype.attach = function(name, target) {
 
         // add fake callback - this is required for measuring duration with around fn
         if (aspect.findCallbackArg(methodArgs) === undefined) {
-          if (methodArgs.length > 0 && methodArgs[methodArgs.length-1] == null) {
-            methodArgs[methodArgs.length-1] = new Function
-          }else{
-            methodArgs[methodArgs.length] = new Function();
+          if (methodArgs.length > 0 && methodArgs[methodArgs.length - 1] == null) {
+            methodArgs[methodArgs.length - 1] = function(){};
+          } else {
+            methodArgs[methodArgs.length] = function(){};
             ++methodArgs.length;
           }
         }

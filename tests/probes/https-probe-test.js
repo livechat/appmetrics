@@ -23,29 +23,16 @@ var https = require('https');
 
 var tap = require('tap');
 
-tap.plan(5);
+tap.plan(3);
 
 tap.tearDown(function() {
   server.close();
 });
 
-var completedTests = 0;
 
 monitor.on('https', function(data) {
-  // First 3 calls should have an 'https' event emitted, then 2 'request' events,
-  // so don't allow more than 3 tests to run here.
-  if (completedTests < 3) {
-    tap.test('HTTPS Event', function(t) {
-      checkHttpsData(data, t);
-      t.end();
-      completedTests++;
-    });
-  }
-});
-
-monitor.on('request', function(data) {
-  tap.test('HTTPS Request Event', function(t) {
-    checkHttpsRequestData(data.request.context, t);
+  tap.test('HTTPS Event', function(t) {
+    checkHttpsData(data, t);
     t.end();
   });
 });
@@ -63,15 +50,6 @@ function checkHttpsData(data, t) {
   t.equals(data.hasOwnProperty('requestHeader'), true, 'Should have HTTPS property requestHeader;');
 }
 
-function checkHttpsRequestData(data, t) {
-  t.equals(data.method, 'GET', 'Should report GET as HTTPS request method');
-  t.equals(data.url, '/', 'Should report / as URL');
-  t.equals(data.hasOwnProperty('statusCode'), true, 'Should have HTTPS property statusCode;');
-  t.ok(isInteger(data.statusCode), 'statusCode is an integer');
-  t.equals(data.hasOwnProperty('requestHeader'), true, 'Should have HTTPS property requestHeader;');
-  t.equals(data.hasOwnProperty('header'), true, 'Should have HTTPS property header;');
-  t.equals(data.hasOwnProperty('contentType'), true, 'Should have HTTPS property contentType;');
-}
 
 function isInteger(n) {
   return isNumeric(n) && n % 1 == 0;
@@ -97,15 +75,3 @@ var options = {
 
 // Request with headers
 https.request(options).end();
-
-setTimeout(function() {
-  // Enable requests
-  monitor.enable('requests');
-  monitor.disable('https');
-
-  // Request with a callback
-  https.get(`https://localhost:${server.address().port}/`, function(res) {});
-
-  // Request without a callback
-  https.get(`https://localhost:${server.address().port}/`);
-}, 2000);
