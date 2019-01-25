@@ -77,8 +77,17 @@ MongoProbe.prototype.aspectCollectionMethod = function(coll, method) {
       var collectionName = target.collectionName;
 
       if (aspect.findCallbackArg(methodArgs) == undefined) {
-        that.metricsProbeEnd(probeData, collectionName, method, methodArgs);
-        that.requestProbeEnd(probeData, method, methodArgs);
+        if (rc != null && rc instanceof Promise) {
+          var cb = function() {
+            that.metricsProbeEnd(probeData, collectionName, method, methodArgs);
+            that.requestProbeEnd(probeData, method, methodArgs);
+          };
+
+          rc.then(cb).catch(cb);
+        } else {
+          that.metricsProbeEnd(probeData, collectionName, method, methodArgs);
+          that.requestProbeEnd(probeData, method, methodArgs);
+        }
       }
       return rc;
     }
